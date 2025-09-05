@@ -55,7 +55,7 @@ func UniqMap[T any, R comparable](collection []T, iteratee func(item T, index in
 //
 // Play: https://go.dev/play/p/-AuYXfy7opz
 func FilterMap[T any, R any](collection []T, callback func(item T, index int) (R, bool)) []R {
-	result := []R{}
+	result := make([]R, 0, len(collection))
 
 	for i := range collection {
 		if r, ok := callback(collection[i], i); ok {
@@ -221,7 +221,11 @@ func Chunk[T any, Slice ~[]T](collection Slice, size int) []Slice {
 		if last > len(collection) {
 			last = len(collection)
 		}
-		result = append(result, collection[i*size:last:last])
+
+		// Copy chunk in a new slice, to prevent memory leak and free memory from initial collection.
+		newSlice := make(Slice, last-i*size)
+		copy(newSlice, collection[i*size:last])
+		result = append(result, newSlice)
 	}
 
 	return result

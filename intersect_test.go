@@ -224,13 +224,15 @@ func TestUnion(t *testing.T) {
 	result1 := Union([]int{0, 1, 2, 3, 4, 5}, []int{0, 2, 10})
 	result2 := Union([]int{0, 1, 2, 3, 4, 5}, []int{6, 7})
 	result3 := Union([]int{0, 1, 2, 3, 4, 5}, []int{})
-	result4 := Union([]int{0, 1, 2}, []int{0, 1, 2})
-	result5 := Union([]int{}, []int{})
+	result4 := Union([]int{0, 1, 2}, []int{0, 1, 2, 3, 3})
+	result5 := Union([]int{0, 1, 2}, []int{0, 1, 2})
+	result6 := Union([]int{}, []int{})
 	is.Equal(result1, []int{0, 1, 2, 3, 4, 5, 10})
 	is.Equal(result2, []int{0, 1, 2, 3, 4, 5, 6, 7})
 	is.Equal(result3, []int{0, 1, 2, 3, 4, 5})
-	is.Equal(result4, []int{0, 1, 2})
-	is.Equal(result5, []int{})
+	is.Equal(result4, []int{0, 1, 2, 3})
+	is.Equal(result5, []int{0, 1, 2})
+	is.Equal(result6, []int{})
 
 	result11 := Union([]int{0, 1, 2, 3, 4, 5}, []int{0, 2, 10}, []int{0, 1, 11})
 	result12 := Union([]int{0, 1, 2, 3, 4, 5}, []int{6, 7}, []int{8, 9})
@@ -329,4 +331,35 @@ func TestWithoutNth(t *testing.T) {
 	allStrings := myStrings{"", "foo", "bar"}
 	nonempty := WithoutNth(allStrings)
 	is.IsType(nonempty, allStrings, "type preserved")
+}
+
+func TestElementsMatch(t *testing.T) {
+	t.Parallel()
+	is := assert.New(t)
+
+	is.False(ElementsMatch([]int{}, []int{1}))
+	is.False(ElementsMatch([]int{1}, []int{2}))
+	is.False(ElementsMatch([]int{1}, []int{1, 2}))
+	is.False(ElementsMatch([]int{1, 1, 2}, []int{2, 2, 1}))
+
+	is.True(ElementsMatch([]int{}, nil))
+	is.True(ElementsMatch([]int{1}, []int{1}))
+	is.True(ElementsMatch([]int{1, 1}, []int{1, 1}))
+	is.True(ElementsMatch([]int{1, 2}, []int{2, 1}))
+	is.True(ElementsMatch([]int{1, 1, 2}, []int{1, 2, 1}))
+}
+
+func TestElementsMatchBy(t *testing.T) {
+	t.Parallel()
+	is := assert.New(t)
+
+	type someType struct {
+		key string
+	}
+
+	is.True(ElementsMatchBy(
+		[]someType{{key: "a"}, {key: "b"}},
+		[]someType{{key: "b"}, {key: "a"}},
+		func(item someType) string { return item.key },
+	))
 }

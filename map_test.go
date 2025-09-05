@@ -513,6 +513,57 @@ func TestMapToSlice(t *testing.T) {
 	is.ElementsMatch(result2, []string{"1", "2", "3", "4"})
 }
 
+func TestFilterMapToSlice(t *testing.T) {
+	t.Parallel()
+	is := assert.New(t)
+
+	result1 := FilterMapToSlice(map[int]int{1: 5, 2: 6, 3: 7, 4: 8}, func(k int, v int) (string, bool) {
+		return fmt.Sprintf("%d_%d", k, v), k%2 == 0
+	})
+	result2 := FilterMapToSlice(map[int]int{1: 5, 2: 6, 3: 7, 4: 8}, func(k int, _ int) (string, bool) {
+		return strconv.FormatInt(int64(k), 10), k%2 == 0
+	})
+
+	is.Equal(len(result1), 2)
+	is.Equal(len(result2), 2)
+	is.ElementsMatch(result1, []string{"2_6", "4_8"})
+	is.ElementsMatch(result2, []string{"2", "4"})
+}
+
+func TestFilterKeys(t *testing.T) {
+	t.Parallel()
+	is := assert.New(t)
+
+	result1 := FilterKeys(map[int]string{1: "foo", 2: "bar", 3: "baz"}, func(k int, v string) bool {
+		return v == "foo"
+	})
+	is.Equal([]int{1}, result1)
+	is.Len(result1, 1)
+
+	result2 := FilterKeys(map[string]int{"foo": 1, "bar": 2, "baz": 3}, func(k string, v int) bool {
+		return false
+	})
+	is.Equal([]string{}, result2)
+	is.Len(result2, 0)
+}
+
+func TestFilterValues(t *testing.T) {
+	t.Parallel()
+	is := assert.New(t)
+
+	result1 := FilterValues(map[int]string{1: "foo", 2: "bar", 3: "baz"}, func(k int, v string) bool {
+		return v == "foo"
+	})
+	is.Equal([]string{"foo"}, result1)
+	is.Len(result1, 1)
+
+	result2 := FilterValues(map[string]int{"foo": 1, "bar": 2, "baz": 3}, func(k string, v int) bool {
+		return false
+	})
+	is.Equal([]int{}, result2)
+	is.Len(result2, 0)
+}
+
 func BenchmarkAssign(b *testing.B) {
 	counts := []int{32768, 1024, 128, 32, 2}
 

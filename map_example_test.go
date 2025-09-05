@@ -232,3 +232,37 @@ func ExampleMapToSlice() {
 	fmt.Printf("%v", result)
 	// Output: [1_1 2_2 3_3 4_4]
 }
+
+func ExampleFilterMapToSlice() {
+	kv := map[int]int64{1: 1, 2: 2, 3: 3, 4: 4}
+
+	result := FilterMapToSlice(kv, func(k int, v int64) (string, bool) {
+		return fmt.Sprintf("%d_%d", k, v), k%2 == 0
+	})
+
+	sort.StringSlice(result).Sort()
+	fmt.Printf("%v", result)
+	// Output: [2_2 4_4]
+}
+
+func ExampleFilterKeys() {
+	kv := map[int]string{1: "foo", 2: "bar", 3: "baz"}
+
+	result := FilterKeys(kv, func(k int, v string) bool {
+		return v == "foo"
+	})
+
+	fmt.Printf("%v", result)
+	// Output: [1]
+}
+
+func ExampleFilterValues() {
+	kv := map[int]string{1: "foo", 2: "bar", 3: "baz"}
+
+	result := FilterValues(kv, func(k int, v string) bool {
+		return v == "foo"
+	})
+
+	fmt.Printf("%v", result)
+	// Output: [foo]
+}
