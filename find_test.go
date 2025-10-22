@@ -1,9 +1,7 @@
 package lo
 
 import (
-	"fmt"
 	"math/rand"
-	"sort"
 	"testing"
 	"time"
 
@@ -17,8 +15,8 @@ func TestIndexOf(t *testing.T) {
 	result1 := IndexOf([]int{0, 1, 2, 1, 2, 3}, 2)
 	result2 := IndexOf([]int{0, 1, 2, 1, 2, 3}, 6)
 
-	is.Equal(result1, 2)
-	is.Equal(result2, -1)
+	is.Equal(2, result1)
+	is.Equal(-1, result2)
 }
 
 func TestLastIndexOf(t *testing.T) {
@@ -28,8 +26,26 @@ func TestLastIndexOf(t *testing.T) {
 	result1 := LastIndexOf([]int{0, 1, 2, 1, 2, 3}, 2)
 	result2 := LastIndexOf([]int{0, 1, 2, 1, 2, 3}, 6)
 
-	is.Equal(result1, 4)
-	is.Equal(result2, -1)
+	is.Equal(4, result1)
+	is.Equal(-1, result2)
+}
+
+func TestHasPrefix(t *testing.T) {
+	t.Parallel()
+	is := assert.New(t)
+
+	is.True(HasPrefix([]int{1, 2, 3, 4}, []int{1, 2}))
+	is.False(HasPrefix([]int{1, 2, 3, 4}, []int{42}))
+	is.True(HasPrefix([]int{1, 2, 3, 4}, nil))
+}
+
+func TestHasSuffix(t *testing.T) {
+	t.Parallel()
+	is := assert.New(t)
+
+	is.True(HasSuffix([]int{1, 2, 3, 4}, []int{3, 4}))
+	is.False(HasSuffix([]int{1, 2, 3, 4}, []int{42}))
+	is.True(HasSuffix([]int{1, 2, 3, 4}, nil))
 }
 
 func TestFind(t *testing.T) {
@@ -48,10 +64,10 @@ func TestFind(t *testing.T) {
 		return item == "b"
 	})
 
-	is.Equal(ok1, true)
-	is.Equal(result1, "b")
-	is.Equal(ok2, false)
-	is.Equal(result2, "")
+	is.True(ok1)
+	is.Equal("b", result1)
+	is.False(ok2)
+	is.Empty(result2)
 }
 
 func TestFindIndexOf(t *testing.T) {
@@ -69,12 +85,12 @@ func TestFindIndexOf(t *testing.T) {
 		return item == "b"
 	})
 
-	is.Equal(item1, "b")
-	is.Equal(ok1, true)
-	is.Equal(index1, 1)
-	is.Equal(item2, "")
-	is.Equal(ok2, false)
-	is.Equal(index2, -1)
+	is.Equal("b", item1)
+	is.True(ok1)
+	is.Equal(1, index1)
+	is.Empty(item2)
+	is.False(ok2)
+	is.Equal(-1, index2)
 }
 
 func TestFindLastIndexOf(t *testing.T) {
@@ -92,12 +108,12 @@ func TestFindLastIndexOf(t *testing.T) {
 		return item == "b"
 	})
 
-	is.Equal(item1, "b")
-	is.Equal(ok1, true)
-	is.Equal(index1, 4)
-	is.Equal(item2, "")
-	is.Equal(ok2, false)
-	is.Equal(index2, -1)
+	is.Equal("b", item1)
+	is.True(ok1)
+	is.Equal(4, index1)
+	is.Empty(item2)
+	is.False(ok2)
+	is.Equal(-1, index2)
 }
 
 func TestFindOrElse(t *testing.T) {
@@ -115,8 +131,8 @@ func TestFindOrElse(t *testing.T) {
 		return item == "b"
 	})
 
-	is.Equal(result1, "b")
-	is.Equal(result2, "x")
+	is.Equal("b", result1)
+	is.Equal("x", result2)
 }
 
 func TestFindKey(t *testing.T) {
@@ -128,7 +144,7 @@ func TestFindKey(t *testing.T) {
 	is.True(ok1)
 
 	result2, ok2 := FindKey(map[string]int{"foo": 1, "bar": 2, "baz": 3}, 42)
-	is.Equal("", result2)
+	is.Empty(result2)
 	is.False(ok2)
 
 	type test struct {
@@ -140,7 +156,7 @@ func TestFindKey(t *testing.T) {
 	is.True(ok3)
 
 	result4, ok4 := FindKey(map[string]test{"foo": {"foo"}, "bar": {"bar"}, "baz": {"baz"}}, test{"hello world"})
-	is.Equal("", result4)
+	is.Empty(result4)
 	is.False(ok4)
 }
 
@@ -157,7 +173,7 @@ func TestFindKeyBy(t *testing.T) {
 	result2, ok2 := FindKeyBy(map[string]int{"foo": 1, "bar": 2, "baz": 3}, func(k string, v int) bool {
 		return false
 	})
-	is.Equal("", result2)
+	is.Empty(result2)
 	is.False(ok2)
 }
 
@@ -166,24 +182,16 @@ func TestFindUniques(t *testing.T) {
 	is := assert.New(t)
 
 	result1 := FindUniques([]int{1, 2, 3})
-
-	is.Equal(3, len(result1))
 	is.Equal([]int{1, 2, 3}, result1)
 
 	result2 := FindUniques([]int{1, 2, 2, 3, 1, 2})
-
-	is.Equal(1, len(result2))
 	is.Equal([]int{3}, result2)
 
 	result3 := FindUniques([]int{1, 2, 2, 1})
-
-	is.Equal(0, len(result3))
-	is.Equal([]int{}, result3)
+	is.Empty(result3)
 
 	result4 := FindUniques([]int{})
-
-	is.Equal(0, len(result4))
-	is.Equal([]int{}, result4)
+	is.Empty(result4)
 
 	type myStrings []string
 	allStrings := myStrings{"", "foo", "bar"}
@@ -198,30 +206,22 @@ func TestFindUniquesBy(t *testing.T) {
 	result1 := FindUniquesBy([]int{0, 1, 2}, func(i int) int {
 		return i % 3
 	})
-
-	is.Equal(3, len(result1))
 	is.Equal([]int{0, 1, 2}, result1)
 
 	result2 := FindUniquesBy([]int{0, 1, 2, 3, 4}, func(i int) int {
 		return i % 3
 	})
-
-	is.Equal(1, len(result2))
 	is.Equal([]int{2}, result2)
 
 	result3 := FindUniquesBy([]int{0, 1, 2, 3, 4, 5}, func(i int) int {
 		return i % 3
 	})
-
-	is.Equal(0, len(result3))
-	is.Equal([]int{}, result3)
+	is.Empty(result3)
 
 	result4 := FindUniquesBy([]int{}, func(i int) int {
 		return i % 3
 	})
-
-	is.Equal(0, len(result4))
-	is.Equal([]int{}, result4)
+	is.Empty(result4)
 
 	type myStrings []string
 	allStrings := myStrings{"", "foo", "bar"}
@@ -236,19 +236,13 @@ func TestFindDuplicates(t *testing.T) {
 	is := assert.New(t)
 
 	result1 := FindDuplicates([]int{1, 2, 2, 1, 2, 3})
-
-	is.Equal(2, len(result1))
 	is.Equal([]int{1, 2}, result1)
 
 	result2 := FindDuplicates([]int{1, 2, 3})
-
-	is.Equal(0, len(result2))
-	is.Equal([]int{}, result2)
+	is.Empty(result2)
 
 	result3 := FindDuplicates([]int{})
-
-	is.Equal(0, len(result3))
-	is.Equal([]int{}, result3)
+	is.Empty(result3)
 
 	type myStrings []string
 	allStrings := myStrings{"", "foo", "bar"}
@@ -263,23 +257,17 @@ func TestFindDuplicatesBy(t *testing.T) {
 	result1 := FindDuplicatesBy([]int{3, 4, 5, 6, 7}, func(i int) int {
 		return i % 3
 	})
-
-	is.Equal(2, len(result1))
 	is.Equal([]int{3, 4}, result1)
 
 	result2 := FindDuplicatesBy([]int{0, 1, 2, 3, 4}, func(i int) int {
 		return i % 5
 	})
-
-	is.Equal(0, len(result2))
-	is.Equal([]int{}, result2)
+	is.Empty(result2)
 
 	result3 := FindDuplicatesBy([]int{}, func(i int) int {
 		return i % 3
 	})
-
-	is.Equal(0, len(result3))
-	is.Equal([]int{}, result3)
+	is.Empty(result3)
 
 	type myStrings []string
 	allStrings := myStrings{"", "foo", "bar"}
@@ -298,10 +286,10 @@ func TestMin(t *testing.T) {
 	result3 := Min([]time.Duration{time.Second, time.Minute, time.Hour})
 	result4 := Min([]int{})
 
-	is.Equal(result1, 1)
-	is.Equal(result2, 1)
-	is.Equal(result3, time.Second)
-	is.Equal(result4, 0)
+	is.Equal(1, result1)
+	is.Equal(1, result2)
+	is.Equal(time.Second, result3)
+	is.Zero(result4)
 }
 
 func TestMinIndex(t *testing.T) {
@@ -313,60 +301,60 @@ func TestMinIndex(t *testing.T) {
 	result3, index3 := MinIndex([]time.Duration{time.Second, time.Minute, time.Hour})
 	result4, index4 := MinIndex([]int{})
 
-	is.Equal(result1, 1)
-	is.Equal(index1, 0)
+	is.Equal(1, result1)
+	is.Zero(index1)
 
-	is.Equal(result2, 1)
-	is.Equal(index2, 2)
+	is.Equal(1, result2)
+	is.Equal(2, index2)
 
-	is.Equal(result3, time.Second)
-	is.Equal(index3, 0)
+	is.Equal(time.Second, result3)
+	is.Zero(index3)
 
-	is.Equal(result4, 0)
-	is.Equal(index4, -1)
+	is.Zero(result4)
+	is.Equal(-1, index4)
 }
 
 func TestMinBy(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
-	result1 := MinBy([]string{"s1", "string2", "s3"}, func(item string, min string) bool {
-		return len(item) < len(min)
+	result1 := MinBy([]string{"s1", "string2", "s3"}, func(item, mIn string) bool {
+		return len(item) < len(mIn)
 	})
-	result2 := MinBy([]string{"string1", "string2", "s3"}, func(item string, min string) bool {
-		return len(item) < len(min)
+	result2 := MinBy([]string{"string1", "string2", "s3"}, func(item, mIn string) bool {
+		return len(item) < len(mIn)
 	})
-	result3 := MinBy([]string{}, func(item string, min string) bool {
-		return len(item) < len(min)
+	result3 := MinBy([]string{}, func(item, mIn string) bool {
+		return len(item) < len(mIn)
 	})
 
-	is.Equal(result1, "s1")
-	is.Equal(result2, "s3")
-	is.Equal(result3, "")
+	is.Equal("s1", result1)
+	is.Equal("s3", result2)
+	is.Empty(result3)
 }
 
 func TestMinIndexBy(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
-	result1, index1 := MinIndexBy([]string{"s1", "string2", "s3"}, func(item string, min string) bool {
-		return len(item) < len(min)
+	result1, index1 := MinIndexBy([]string{"s1", "string2", "s3"}, func(item, mIn string) bool {
+		return len(item) < len(mIn)
 	})
-	result2, index2 := MinIndexBy([]string{"string1", "string2", "s3"}, func(item string, min string) bool {
-		return len(item) < len(min)
+	result2, index2 := MinIndexBy([]string{"string1", "string2", "s3"}, func(item, mIn string) bool {
+		return len(item) < len(mIn)
 	})
-	result3, index3 := MinIndexBy([]string{}, func(item string, min string) bool {
-		return len(item) < len(min)
+	result3, index3 := MinIndexBy([]string{}, func(item, mIn string) bool {
+		return len(item) < len(mIn)
 	})
 
-	is.Equal(result1, "s1")
-	is.Equal(index1, 0)
+	is.Equal("s1", result1)
+	is.Zero(index1)
 
-	is.Equal(result2, "s3")
-	is.Equal(index2, 2)
+	is.Equal("s3", result2)
+	is.Equal(2, index2)
 
-	is.Equal(result3, "")
-	is.Equal(index3, -1)
+	is.Empty(result3)
+	is.Equal(-1, index3)
 }
 
 func TestEarliest(t *testing.T) {
@@ -378,8 +366,8 @@ func TestEarliest(t *testing.T) {
 	result1 := Earliest(a, b)
 	result2 := Earliest()
 
-	is.Equal(result1, a)
-	is.Equal(result2, time.Time{})
+	is.Equal(a, result1)
+	is.Zero(result2)
 }
 
 func TestEarliestBy(t *testing.T) {
@@ -403,9 +391,9 @@ func TestEarliestBy(t *testing.T) {
 		return i.bar
 	})
 
-	is.Equal(result1, foo{t3})
-	is.Equal(result2, foo{t1})
-	is.Equal(result3, foo{})
+	is.Equal(foo{t3}, result1)
+	is.Equal(foo{t1}, result2)
+	is.Zero(result3)
 }
 
 func TestMax(t *testing.T) {
@@ -417,10 +405,10 @@ func TestMax(t *testing.T) {
 	result3 := Max([]time.Duration{time.Second, time.Minute, time.Hour})
 	result4 := Max([]int{})
 
-	is.Equal(result1, 3)
-	is.Equal(result2, 3)
-	is.Equal(result3, time.Hour)
-	is.Equal(result4, 0)
+	is.Equal(3, result1)
+	is.Equal(3, result2)
+	is.Equal(time.Hour, result3)
+	is.Zero(result4)
 }
 
 func TestMaxIndex(t *testing.T) {
@@ -432,60 +420,60 @@ func TestMaxIndex(t *testing.T) {
 	result3, index3 := MaxIndex([]time.Duration{time.Second, time.Minute, time.Hour})
 	result4, index4 := MaxIndex([]int{})
 
-	is.Equal(result1, 3)
-	is.Equal(index1, 2)
+	is.Equal(3, result1)
+	is.Equal(2, index1)
 
-	is.Equal(result2, 3)
-	is.Equal(index2, 0)
+	is.Equal(3, result2)
+	is.Zero(index2)
 
-	is.Equal(result3, time.Hour)
-	is.Equal(index3, 2)
+	is.Equal(time.Hour, result3)
+	is.Equal(2, index3)
 
-	is.Equal(result4, 0)
-	is.Equal(index4, -1)
+	is.Zero(result4)
+	is.Equal(-1, index4)
 }
 
 func TestMaxBy(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
-	result1 := MaxBy([]string{"s1", "string2", "s3"}, func(item string, max string) bool {
-		return len(item) > len(max)
+	result1 := MaxBy([]string{"s1", "string2", "s3"}, func(item, mAx string) bool {
+		return len(item) > len(mAx)
 	})
-	result2 := MaxBy([]string{"string1", "string2", "s3"}, func(item string, max string) bool {
-		return len(item) > len(max)
+	result2 := MaxBy([]string{"string1", "string2", "s3"}, func(item, mAx string) bool {
+		return len(item) > len(mAx)
 	})
-	result3 := MaxBy([]string{}, func(item string, max string) bool {
-		return len(item) > len(max)
+	result3 := MaxBy([]string{}, func(item, mAx string) bool {
+		return len(item) > len(mAx)
 	})
 
-	is.Equal(result1, "string2")
-	is.Equal(result2, "string1")
-	is.Equal(result3, "")
+	is.Equal("string2", result1)
+	is.Equal("string1", result2)
+	is.Empty(result3)
 }
 
 func TestMaxIndexBy(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
-	result1, index1 := MaxIndexBy([]string{"s1", "string2", "s3"}, func(item string, max string) bool {
-		return len(item) > len(max)
+	result1, index1 := MaxIndexBy([]string{"s1", "string2", "s3"}, func(item, mAx string) bool {
+		return len(item) > len(mAx)
 	})
-	result2, index2 := MaxIndexBy([]string{"string1", "string2", "s3"}, func(item string, max string) bool {
-		return len(item) > len(max)
+	result2, index2 := MaxIndexBy([]string{"string1", "string2", "s3"}, func(item, mAx string) bool {
+		return len(item) > len(mAx)
 	})
-	result3, index3 := MaxIndexBy([]string{}, func(item string, max string) bool {
-		return len(item) > len(max)
+	result3, index3 := MaxIndexBy([]string{}, func(item, mAx string) bool {
+		return len(item) > len(mAx)
 	})
 
-	is.Equal(result1, "string2")
-	is.Equal(index1, 1)
+	is.Equal("string2", result1)
+	is.Equal(1, index1)
 
-	is.Equal(result2, "string1")
-	is.Equal(index2, 0)
+	is.Equal("string1", result2)
+	is.Zero(index2)
 
-	is.Equal(result3, "")
-	is.Equal(index3, -1)
+	is.Empty(result3)
+	is.Equal(-1, index3)
 }
 
 func TestLatest(t *testing.T) {
@@ -497,8 +485,8 @@ func TestLatest(t *testing.T) {
 	result1 := Latest(a, b)
 	result2 := Latest()
 
-	is.Equal(result1, b)
-	is.Equal(result2, time.Time{})
+	is.Equal(b, result1)
+	is.Zero(result2)
 }
 
 func TestLatestBy(t *testing.T) {
@@ -522,9 +510,9 @@ func TestLatestBy(t *testing.T) {
 		return i.bar
 	})
 
-	is.Equal(result1, foo{t2})
-	is.Equal(result2, foo{t1})
-	is.Equal(result3, foo{})
+	is.Equal(foo{t2}, result1)
+	is.Equal(foo{t1}, result2)
+	is.Zero(result3)
 }
 
 func TestFirst(t *testing.T) {
@@ -534,10 +522,10 @@ func TestFirst(t *testing.T) {
 	result1, ok1 := First([]int{1, 2, 3})
 	result2, ok2 := First([]int{})
 
-	is.Equal(result1, 1)
-	is.Equal(ok1, true)
-	is.Equal(result2, 0)
-	is.Equal(ok2, false)
+	is.Equal(1, result1)
+	is.True(ok1)
+	is.Zero(result2)
+	is.False(ok2)
 }
 
 func TestFirstOrEmpty(t *testing.T) {
@@ -548,9 +536,9 @@ func TestFirstOrEmpty(t *testing.T) {
 	result2 := FirstOrEmpty([]int{})
 	result3 := FirstOrEmpty([]string{})
 
-	is.Equal(result1, 1)
-	is.Equal(result2, 0)
-	is.Equal(result3, "")
+	is.Equal(1, result1)
+	is.Zero(result2)
+	is.Empty(result3)
 }
 
 func TestFirstOr(t *testing.T) {
@@ -561,9 +549,9 @@ func TestFirstOr(t *testing.T) {
 	result2 := FirstOr([]int{}, 23)
 	result3 := FirstOr([]string{}, "test")
 
-	is.Equal(result1, 1)
-	is.Equal(result2, 23)
-	is.Equal(result3, "test")
+	is.Equal(1, result1)
+	is.Equal(23, result2)
+	is.Equal("test", result3)
 }
 
 func TestLast(t *testing.T) {
@@ -573,9 +561,9 @@ func TestLast(t *testing.T) {
 	result1, ok1 := Last([]int{1, 2, 3})
 	result2, ok2 := Last([]int{})
 
-	is.Equal(result1, 3)
+	is.Equal(3, result1)
 	is.True(ok1)
-	is.Equal(result2, 0)
+	is.Zero(result2)
 	is.False(ok2)
 }
 
@@ -587,9 +575,9 @@ func TestLastOrEmpty(t *testing.T) {
 	result2 := LastOrEmpty([]int{})
 	result3 := LastOrEmpty([]string{})
 
-	is.Equal(result1, 3)
-	is.Equal(result2, 0)
-	is.Equal(result3, "")
+	is.Equal(3, result1)
+	is.Zero(result2)
+	is.Empty(result3)
 }
 
 func TestLastOr(t *testing.T) {
@@ -600,9 +588,9 @@ func TestLastOr(t *testing.T) {
 	result2 := LastOr([]int{}, 23)
 	result3 := LastOr([]string{}, "test")
 
-	is.Equal(result1, 3)
-	is.Equal(result2, 23)
-	is.Equal(result3, "test")
+	is.Equal(3, result1)
+	is.Equal(23, result2)
+	is.Equal("test", result3)
 }
 
 func TestNth(t *testing.T) {
@@ -616,24 +604,27 @@ func TestNth(t *testing.T) {
 	result5, err5 := Nth([]int{42}, 0)
 	result6, err6 := Nth([]int{42}, -1)
 
-	is.Equal(result1, 2)
-	is.Equal(err1, nil)
-	is.Equal(result2, 2)
-	is.Equal(err2, nil)
-	is.Equal(result3, 0)
-	is.Equal(err3, fmt.Errorf("nth: 42 out of slice bounds"))
-	is.Equal(result4, 0)
-	is.Equal(err4, fmt.Errorf("nth: 0 out of slice bounds"))
-	is.Equal(result5, 42)
-	is.Equal(err5, nil)
-	is.Equal(result6, 42)
-	is.Equal(err6, nil)
+	is.Equal(2, result1)
+	is.NoError(err1)
+	is.Equal(2, result2)
+	is.NoError(err2)
+	is.Zero(result3)
+	is.EqualError(err3, "nth: 42 out of slice bounds")
+	is.Zero(result4)
+	is.EqualError(err4, "nth: 0 out of slice bounds")
+	is.Equal(42, result5)
+	is.NoError(err5)
+	is.Equal(42, result6)
+	is.NoError(err6)
 }
 
 func TestNthOr(t *testing.T) {
 	t.Parallel()
-	is := assert.New(t)
+
 	t.Run("Integers", func(t *testing.T) {
+		t.Parallel()
+		is := assert.New(t)
+
 		const defaultValue = -1
 		intSlice := []int{10, 20, 30, 40, 50}
 
@@ -643,6 +634,9 @@ func TestNthOr(t *testing.T) {
 	})
 
 	t.Run("Strings", func(t *testing.T) {
+		t.Parallel()
+		is := assert.New(t)
+
 		const defaultValue = "none"
 		strSlice := []string{"apple", "banana", "cherry", "date"}
 
@@ -652,6 +646,9 @@ func TestNthOr(t *testing.T) {
 	})
 
 	t.Run("Structs", func(t *testing.T) {
+		t.Parallel()
+		is := assert.New(t)
+
 		type User struct {
 			ID   int
 			Name string
@@ -675,26 +672,33 @@ func TestNthOr(t *testing.T) {
 
 func TestNthOrEmpty(t *testing.T) {
 	t.Parallel()
-	is := assert.New(t)
+
 	t.Run("Integers", func(t *testing.T) {
-		const defaultValue = 0
+		t.Parallel()
+		is := assert.New(t)
+
 		intSlice := []int{10, 20, 30, 40, 50}
 
 		is.Equal(30, NthOrEmpty(intSlice, 2))
 		is.Equal(50, NthOrEmpty(intSlice, -1))
-		is.Equal(defaultValue, NthOrEmpty(intSlice, 10))
+		is.Zero(NthOrEmpty(intSlice, 10))
 	})
 
 	t.Run("Strings", func(t *testing.T) {
-		const defaultValue = ""
+		t.Parallel()
+		is := assert.New(t)
+
 		strSlice := []string{"apple", "banana", "cherry", "date"}
 
 		is.Equal("banana", NthOrEmpty(strSlice, 1))
 		is.Equal("cherry", NthOrEmpty(strSlice, -2))
-		is.Equal(defaultValue, NthOrEmpty(strSlice, 10))
+		is.Empty(NthOrEmpty(strSlice, 10))
 	})
 
 	t.Run("Structs", func(t *testing.T) {
+		t.Parallel()
+		is := assert.New(t)
+
 		type User struct {
 			ID   int
 			Name string
@@ -711,8 +715,7 @@ func TestNthOrEmpty(t *testing.T) {
 		expectedUser = User{ID: 3, Name: "Charlie"}
 		is.Equal(expectedUser, NthOrEmpty(userSlice, -1))
 
-		expectedUser = User{ID: 0, Name: ""}
-		is.Equal(expectedUser, NthOrEmpty(userSlice, 10))
+		is.Zero(NthOrEmpty(userSlice, 10))
 	})
 }
 
@@ -720,13 +723,11 @@ func TestSample(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
-	rand.Seed(time.Now().UnixNano())
-
 	result1 := Sample([]string{"a", "b", "c"})
 	result2 := Sample([]string{})
 
 	is.True(Contains([]string{"a", "b", "c"}, result1))
-	is.Equal(result2, "")
+	is.Empty(result2)
 }
 
 func TestSampleBy(t *testing.T) {
@@ -739,22 +740,18 @@ func TestSampleBy(t *testing.T) {
 	result2 := SampleBy([]string{}, rand.Intn)
 
 	is.True(Contains([]string{"a", "b", "c"}, result1))
-	is.Equal(result2, "")
+	is.Empty(result2)
 }
 
 func TestSamples(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
-	rand.Seed(time.Now().UnixNano())
-
 	result1 := Samples([]string{"a", "b", "c"}, 3)
 	result2 := Samples([]string{}, 3)
 
-	sort.Strings(result1)
-
-	is.Equal(result1, []string{"a", "b", "c"})
-	is.Equal(result2, []string{})
+	is.ElementsMatch(result1, []string{"a", "b", "c"})
+	is.Empty(result2)
 
 	type myStrings []string
 	allStrings := myStrings{"", "foo", "bar"}
@@ -771,10 +768,8 @@ func TestSamplesBy(t *testing.T) {
 	result1 := SamplesBy([]string{"a", "b", "c"}, 3, r.Intn)
 	result2 := SamplesBy([]string{}, 3, r.Intn)
 
-	sort.Strings(result1)
-
-	is.Equal(result1, []string{"a", "b", "c"})
-	is.Equal(result2, []string{})
+	is.ElementsMatch(result1, []string{"a", "b", "c"})
+	is.Empty(result2)
 
 	type myStrings []string
 	allStrings := myStrings{"", "foo", "bar"}

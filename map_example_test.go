@@ -191,7 +191,7 @@ func ExampleChunkEntries() {
 func ExampleMapKeys() {
 	kv := map[int]int{1: 1, 2: 2, 3: 3, 4: 4}
 
-	result := MapKeys(kv, func(_ int, k int) string {
+	result := MapKeys(kv, func(_, k int) string {
 		return strconv.FormatInt(int64(k), 10)
 	})
 
@@ -202,7 +202,7 @@ func ExampleMapKeys() {
 func ExampleMapValues() {
 	kv := map[int]int{1: 1, 2: 2, 3: 3, 4: 4}
 
-	result := MapValues(kv, func(v int, _ int) string {
+	result := MapValues(kv, func(v, _ int) string {
 		return strconv.FormatInt(int64(v), 10)
 	})
 
@@ -217,7 +217,7 @@ func ExampleMapEntries() {
 		return v, k
 	})
 
-	fmt.Printf("%v\n", result)
+	fmt.Printf("%v", result)
 	// Output: map[1:foo 2:bar]
 }
 
@@ -228,7 +228,7 @@ func ExampleMapToSlice() {
 		return fmt.Sprintf("%d_%d", k, v)
 	})
 
-	sort.StringSlice(result).Sort()
+	sort.Strings(result)
 	fmt.Printf("%v", result)
 	// Output: [1_1 2_2 3_3 4_4]
 }
@@ -240,7 +240,7 @@ func ExampleFilterMapToSlice() {
 		return fmt.Sprintf("%d_%d", k, v), k%2 == 0
 	})
 
-	sort.StringSlice(result).Sort()
+	sort.Strings(result)
 	fmt.Printf("%v", result)
 	// Output: [2_2 4_4]
 }

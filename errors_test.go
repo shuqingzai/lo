@@ -2,13 +2,13 @@ package lo
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestValidate(t *testing.T) {
+	t.Parallel()
 	is := assert.New(t)
 
 	slice := []string{"a"}
@@ -264,7 +264,7 @@ func TestTry(t *testing.T) {
 		return nil
 	}))
 	is.False(Try(func() error {
-		return fmt.Errorf("fail")
+		return errors.New("fail")
 	}))
 }
 
@@ -407,17 +407,17 @@ func TestTryOrX(t *testing.T) {
 
 		is.Equal(42, a1)
 		is.Equal("hello", b1)
-		is.Equal(false, c1)
+		is.False(c1)
 		is.False(ok1)
 
 		is.Equal(42, a2)
 		is.Equal("hello", b2)
-		is.Equal(false, c2)
+		is.False(c2)
 		is.False(ok2)
 
 		is.Equal(21, a3)
 		is.Equal("world", b3)
-		is.Equal(true, c3)
+		is.True(c3)
 		is.True(ok3)
 	}
 
@@ -428,19 +428,19 @@ func TestTryOrX(t *testing.T) {
 
 		is.Equal(42, a1)
 		is.Equal("hello", b1)
-		is.Equal(false, c1)
+		is.False(c1)
 		is.Equal(42, d1)
 		is.False(ok1)
 
 		is.Equal(42, a2)
 		is.Equal("hello", b2)
-		is.Equal(false, c2)
+		is.False(c2)
 		is.Equal(42, d2)
 		is.False(ok2)
 
 		is.Equal(21, a3)
 		is.Equal("world", b3)
-		is.Equal(true, c3)
+		is.True(c3)
 		is.Equal(21, d3)
 		is.True(ok3)
 	}
@@ -452,21 +452,21 @@ func TestTryOrX(t *testing.T) {
 
 		is.Equal(42, a1)
 		is.Equal("hello", b1)
-		is.Equal(false, c1)
+		is.False(c1)
 		is.Equal(42, d1)
 		is.Equal(42, e1)
 		is.False(ok1)
 
 		is.Equal(42, a2)
 		is.Equal("hello", b2)
-		is.Equal(false, c2)
+		is.False(c2)
 		is.Equal(42, d2)
 		is.Equal(42, e2)
 		is.False(ok2)
 
 		is.Equal(21, a3)
 		is.Equal("world", b3)
-		is.Equal(true, c3)
+		is.True(c3)
 		is.Equal(21, d3)
 		is.Equal(21, e3)
 		is.True(ok3)
@@ -479,7 +479,7 @@ func TestTryOrX(t *testing.T) {
 
 		is.Equal(42, a1)
 		is.Equal("hello", b1)
-		is.Equal(false, c1)
+		is.False(c1)
 		is.Equal(42, d1)
 		is.Equal(42, e1)
 		is.Equal(42, f1)
@@ -487,7 +487,7 @@ func TestTryOrX(t *testing.T) {
 
 		is.Equal(42, a2)
 		is.Equal("hello", b2)
-		is.Equal(false, c2)
+		is.False(c2)
 		is.Equal(42, d2)
 		is.Equal(42, e2)
 		is.Equal(42, f2)
@@ -495,7 +495,7 @@ func TestTryOrX(t *testing.T) {
 
 		is.Equal(21, a3)
 		is.Equal("world", b3)
-		is.Equal(true, c3)
+		is.True(c3)
 		is.Equal(21, d3)
 		is.Equal(21, e3)
 		is.Equal(21, f3)
@@ -518,13 +518,15 @@ func TestTryWithErrorValue(t *testing.T) {
 		return errors.New("foo")
 	})
 	is.False(ok)
-	is.EqualError(err.(error), "foo")
+	e, isError := err.(error)
+	is.True(isError)
+	is.EqualError(e, "foo")
 
 	err, ok = TryWithErrorValue(func() error {
 		return nil
 	})
 	is.True(ok)
-	is.Equal(nil, err)
+	is.Nil(err)
 }
 
 func TestTryCatch(t *testing.T) {
@@ -585,9 +587,9 @@ func TestErrorsAs(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
-	err, ok := ErrorsAs[*internalError](fmt.Errorf("hello world"))
+	err, ok := ErrorsAs[*internalError](errors.New("hello world"))
 	is.False(ok)
-	is.Nil(nil, err)
+	is.Nil(err)
 
 	err, ok = ErrorsAs[*internalError](&internalError{foobar: "foobar"})
 	is.True(ok)
@@ -595,7 +597,7 @@ func TestErrorsAs(t *testing.T) {
 
 	err, ok = ErrorsAs[*internalError](nil)
 	is.False(ok)
-	is.Nil(nil, err)
+	is.Nil(err)
 }
 
 func TestAssert(t *testing.T) {
@@ -618,7 +620,7 @@ func TestAssert(t *testing.T) {
 		Assert(false, "user defined message")
 	})
 
-	//checks that the examples in `README.md` compile
+	// checks that the examples in `README.md` compile
 	{
 		age := 20
 		is.NotPanics(func() {
@@ -650,7 +652,7 @@ func TestAssertf(t *testing.T) {
 		Assertf(false, "user defined message %d %d", 1, 2)
 	})
 
-	//checks that the example in `README.md` compiles
+	// checks that the example in `README.md` compiles
 	{
 		age := 7
 		is.PanicsWithValue("assertion failed: user age must be >= 15, got 7", func() {
